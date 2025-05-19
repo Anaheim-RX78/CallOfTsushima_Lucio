@@ -10,8 +10,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/PlayerState.h"
+#include "Net/UnrealNetwork.h"
 
-DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // ACallOfTsushimaCharacter
@@ -47,7 +48,7 @@ void ACallOfTsushimaCharacter::BeginPlay()
 
 	InitialPosition = GetActorLocation();
 	InitialRotation = GetActorRotation();
-
+	
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -56,7 +57,14 @@ void ACallOfTsushimaCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+}
 
+void ACallOfTsushimaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACallOfTsushimaCharacter, ColorTag);
+	DOREPLIFETIME(ACallOfTsushimaCharacter, Health);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -80,7 +88,8 @@ void ACallOfTsushimaCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	}
 	else
 	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		
+		// UE_LOG(, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
 
@@ -88,6 +97,40 @@ void ACallOfTsushimaCharacter::SetupPlayerInputComponent(UInputComponent* Player
 void ACallOfTsushimaCharacter::FireFX_Implementation()
 {
 	WeaponComponent->HandleProjectileFX();
+}
+
+void ACallOfTsushimaCharacter::UpdateColorTag_Implementation()
+{
+	// if (ColorTag.IsEmpty())
+	{
+		if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		{
+			APlayerState* CurrState = PlayerController->PlayerState;
+
+			if (CurrState == nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("STATE NON TROVATO"));
+			}
+			else
+			{
+				int32 UniqID = CurrState->GetPlayerId();
+				if (UniqID % 2 == 0)
+				{
+					ColorTag = "Blue";
+				}
+				else
+				{
+					ColorTag =  "Red";
+				}
+				
+			}
+		}
+	}
+}
+
+void ACallOfTsushimaCharacter::UpdateColorTagForEveryone_Implementation()
+{
+	UpdateColorTag();
 }
 
 void ACallOfTsushimaCharacter::Shoot()
@@ -105,7 +148,7 @@ void ACallOfTsushimaCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// add movement 
+		// add movement
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
@@ -129,10 +172,12 @@ void ACallOfTsushimaCharacter::Fire(const FInputActionValue& Value)
 	if (GetLocalRole()  == ROLE_Authority)
 	{
 		Shoot();
+		UpdateColorTag();
 	}
 	else
 	{
 		OnFire();
+		UpdateColorTagForEveryone();
 	}
 }
 

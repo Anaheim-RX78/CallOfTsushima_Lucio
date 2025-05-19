@@ -42,6 +42,11 @@ class ACallOfTsushimaProjectile : public AActor
 public:
 	ACallOfTsushimaProjectile();
 
+
+	UPROPERTY(EditAnywhere, Replicated)
+	FName ColorTag;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	/** called when projectile hits something */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

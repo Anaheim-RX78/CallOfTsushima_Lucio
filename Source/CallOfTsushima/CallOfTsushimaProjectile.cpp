@@ -2,9 +2,12 @@
 
 #include "CallOfTsushimaProjectile.h"
 
+#include "CallOfTsushimaCharacter.h"
 #include "PaintableSurface.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 
 void ACallOfTsushimaProjectile::DestroyActor(AActor* ActorToDestroy)
 {
@@ -61,34 +64,33 @@ ACallOfTsushimaProjectile::ACallOfTsushimaProjectile()
 	InitialLifeSpan = 3.0f;
 }
 
+void ACallOfTsushimaProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACallOfTsushimaProjectile, ColorTag);
+}
+
 void ACallOfTsushimaProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
 	}
-
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("My tag is: %s"), *ColorTag.ToString()));
 	if (Cast<APaintableSurface>(OtherActor))
 	{
 		Destroy();
 		return;
 	}
 
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherActor->ActorHasTag("DestroyMe"))
+	if (ACallOfTsushimaCharacter* TPChar = Cast<ACallOfTsushimaCharacter>(OtherActor))
 	{
-		if (GetLocalRole()  == ROLE_Authority)
-		{
-			BroadcastDestroy(OtherActor);
-			SpawnVFX(Hit);
-		}
-		else
-		{
-			DestroyActor(OtherActor);
-			BroadcastVFX(Hit);
-		}
+		TPChar->OnHitByProjectile.Broadcast();
 		Destroy();
 	}
+	
 
 }

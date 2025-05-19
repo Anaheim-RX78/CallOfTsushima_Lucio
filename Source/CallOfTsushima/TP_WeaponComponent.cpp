@@ -38,11 +38,9 @@ void UTP_WeaponComponent::HandleProjectile()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	
 			// Spawn the projectile at the muzzle
-			AActor* SpawnedActor = World->SpawnActor<ACallOfTsushimaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			if (SpawnedActor)
-			{
-				SpawnedActor->Tags.Add(GetOwnerRole()  == ROLE_Authority ? FName("Red") : FName("Blue"));
-			}
+			ACallOfTsushimaProjectile* SpawnedActor = World->SpawnActor<ACallOfTsushimaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Shooting tag: %s"), *Character->ColorTag));
+			SpawnedActor->ColorTag = FName(Character->ColorTag);
 		}
 	}
 }

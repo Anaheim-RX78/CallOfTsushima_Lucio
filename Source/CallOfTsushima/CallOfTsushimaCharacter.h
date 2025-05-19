@@ -15,7 +15,7 @@ class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHitByProjectile);
 
 UCLASS(config=Game)
 class ACallOfTsushimaCharacter : public ACharacter
@@ -45,6 +45,7 @@ class ACallOfTsushimaCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* FireAction;
 
+
 	
 public:
 	ACallOfTsushimaCharacter();
@@ -53,6 +54,17 @@ protected:
 	virtual void BeginPlay();
 	
 public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health", Replicated)
+	float Health = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	FString ColorTag = "";
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnHitByProjectile OnHitByProjectile;
 	
 	UPROPERTY()
 	UTP_WeaponComponent* WeaponComponent;
@@ -77,6 +89,12 @@ public:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void FireFX();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void UpdateColorTag();
+
+	UFUNCTION(Server, Unreliable)
+	void UpdateColorTagForEveryone();
 
 	UFUNCTION()
 	void Shoot();

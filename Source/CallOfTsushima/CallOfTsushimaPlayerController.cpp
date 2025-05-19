@@ -3,6 +3,7 @@
 
 #include "CallOfTsushimaPlayerController.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/PlayerState.h"
 
 void ACallOfTsushimaPlayerController::BeginPlay()
 {
@@ -16,4 +17,5 @@ void ACallOfTsushimaPlayerController::BeginPlay()
 
 		UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
 	}
+	
 }

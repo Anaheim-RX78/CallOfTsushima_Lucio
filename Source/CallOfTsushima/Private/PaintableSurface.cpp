@@ -33,9 +33,9 @@ void APaintableSurface::BeginPlay()
 void APaintableSurface::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
                             UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    if (Cast<ACallOfTsushimaProjectile>(OtherActor) != nullptr)
+    if (ACallOfTsushimaProjectile* Proj = Cast<ACallOfTsushimaProjectile>(OtherActor))
     {
-        FLinearColor Color = OtherActor->ActorHasTag("Red") ? FLinearColor::Red : FLinearColor::Blue;
+        FLinearColor Color = Proj->ColorTag == FName("Red") ? FLinearColor::Red : FLinearColor::Blue;
         PaintCellAtWorldLocation(Hit, Color);
     }
 }
