@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CallOfTsushimaProjectile.h"
+
+#include "PaintableSurface.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -66,6 +68,12 @@ void ACallOfTsushimaProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
+	}
+
+	if (Cast<APaintableSurface>(OtherActor))
+	{
+		Destroy();
+		return;
 	}
 
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherActor->ActorHasTag("DestroyMe"))

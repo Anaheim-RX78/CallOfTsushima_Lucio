@@ -18,23 +18,6 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 }
 
 
-// void UTP_WeaponComponent::Fire()
-// {
-	// if (Character == nullptr || Character->GetController() == nullptr)
-	// {
-	// 	return;
-	// }
-	//
-	// if (ROLE_Authority == GetOwnerRole())
-	// {
-	// 	HandleProjectile();
-	// } else
-	// {
-	// 	ServerFire();
-	// }
-// }
-
-
 
 
 
@@ -55,7 +38,11 @@ void UTP_WeaponComponent::HandleProjectile()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	
 			// Spawn the projectile at the muzzle
-			World->SpawnActor<ACallOfTsushimaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			AActor* SpawnedActor = World->SpawnActor<ACallOfTsushimaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			if (SpawnedActor)
+			{
+				SpawnedActor->Tags.Add(GetOwnerRole()  == ROLE_Authority ? FName("Red") : FName("Blue"));
+			}
 		}
 	}
 }
@@ -66,7 +53,7 @@ void UTP_WeaponComponent::HandleProjectileFX()
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+		// UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
 	}
 	
 	// Try and play a firing animation if specified
