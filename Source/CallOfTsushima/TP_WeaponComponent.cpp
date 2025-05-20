@@ -39,7 +39,7 @@ void UTP_WeaponComponent::HandleProjectile()
 	
 			// Spawn the projectile at the muzzle
 			ACallOfTsushimaProjectile* SpawnedActor = World->SpawnActor<ACallOfTsushimaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Shooting tag: %s"), *Character->ColorTag));
+			
 			SpawnedActor->ColorTag = FName(Character->ColorTag);
 		}
 	}

@@ -6,13 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "PaintableSurface.generated.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum class EPaintColor : uint8
 {
-	None,
 	Red,
 	Blue
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPainted);
 
 UCLASS()
 class CALLOFTSUSHIMA_API APaintableSurface : public AActor
@@ -31,9 +32,12 @@ protected:
 			   UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void PaintCellAtWorldLocation(const FHitResult& Hit, FLinearColor Color);
-	void UpdateColorStats();
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+	TMap<EPaintColor, int> GetColorStats();
+	
 	UPROPERTY(VisibleAnywhere, Category = "PaintableSurface")
 	UStaticMeshComponent* Mesh;
 
@@ -54,6 +58,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "PaintableSurface")
 	float BakePeriodInSeconds = 2;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPainted OnPainted;
 	
 
 private:

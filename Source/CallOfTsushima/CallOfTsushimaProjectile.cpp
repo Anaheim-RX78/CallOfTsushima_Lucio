@@ -73,13 +73,7 @@ void ACallOfTsushimaProjectile::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 
 void ACallOfTsushimaProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
-	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-	}
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("My tag is: %s"), *ColorTag.ToString()));
 	if (Cast<APaintableSurface>(OtherActor))
 	{
 		Destroy();
@@ -88,9 +82,10 @@ void ACallOfTsushimaProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 
 	if (ACallOfTsushimaCharacter* TPChar = Cast<ACallOfTsushimaCharacter>(OtherActor))
 	{
+		if (ColorTag == TPChar->ColorTag)
+			 return;
 		TPChar->OnHitByProjectile.Broadcast();
 		Destroy();
 	}
-	
 
 }

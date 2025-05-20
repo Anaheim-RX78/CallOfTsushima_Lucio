@@ -66,7 +66,6 @@ void APaintableSurface::PaintCellAtWorldLocation(const FHitResult& Hit, FLinearC
             PaintedGrid[Coords] = Color;
             TemporaryDecals[Coords]->DestroyComponent();
         }
-        UpdateColorStats();
 
         FVector DecalSize(1, GridCellSize * 0.5f, GridCellSize * 0.5f); // Box size (X = depth, Y/Z = width/height)
 
@@ -82,24 +81,29 @@ void APaintableSurface::PaintCellAtWorldLocation(const FHitResult& Hit, FLinearC
         Decal->SetDecalMaterial(DecalMID);
         TemporaryDecals.Add(Coords, Decal);
     }
+    OnPainted.Broadcast();
 }
 
-void APaintableSurface::UpdateColorStats()
+TMap<EPaintColor, int> APaintableSurface::GetColorStats()
 {
-    int32 Total = PaintedGrid.Num();
     int32 Red = 0;
     int32 Blue = 0;
+    TMap<EPaintColor, int> ColorStats;
+    ColorStats.Add(EPaintColor::Red, 0);
+    ColorStats.Add(EPaintColor::Blue, 0);
 
+    if (PaintedGrid.IsEmpty()) return ColorStats;
+    
     for (const auto& Pair : PaintedGrid)
     {
         if (Pair.Value == FLinearColor::Red) Red++;
         else if (Pair.Value == FLinearColor::Blue) Blue++;
     }
-
-    float RedPct = Total > 0 ? (100.f * Red) / Total : 0.f;
-    float BluePct = Total > 0 ? (100.f * Blue) / Total : 0.f;
-
-    UE_LOG(LogTemp, Log, TEXT("Red: %.1f%% | Blue: %.1f%% (%d total cells)"), RedPct, BluePct, Total);
+    
+    ColorStats[EPaintColor::Red] = Red;
+    ColorStats[EPaintColor::Blue] = Blue;
+    
+    return ColorStats;
 }
 
 // Called every frame
