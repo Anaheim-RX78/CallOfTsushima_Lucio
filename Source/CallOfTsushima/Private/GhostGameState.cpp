@@ -2,10 +2,6 @@
 
 
 #include "GhostGameState.h"
-
-#include "HttpModule.h"
-#include "Interfaces/IHttpRequest.h"
-#include "Interfaces/IHttpResponse.h"
 #include "Kismet/GameplayStatics.h"
 
 void AGhostGameState::BeginPlay()
@@ -24,17 +20,7 @@ void AGhostGameState::BeginPlay()
 		}
 	}
 
-	const TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
-	Request->SetURL("https://meowfacts.herokuapp.com/");
-	Request->SetVerb("GET");
-	Request->SetHeader("Content-Type", "application/json");
-	Request->OnProcessRequestComplete().BindLambda([](FHttpRequestPtr,FHttpResponsePtr Response,bool)
-	{
-		if (!Response.IsValid()) return;
-		FString ResponseText = Response->GetContentAsString();
-		GEngine->AddOnScreenDebugMessage(-1, 500.f, FColor::Red, FString(ResponseText));
-	});
-	Request->ProcessRequest();
+	// Request->SetURL("https://meowfacts.herokuapp.com/");
 }
 
 TMap<EPaintColor, int> AGhostGameState::GetAllColors()

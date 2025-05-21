@@ -35,7 +35,9 @@ void APaintableSurface::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 {
     if (ACallOfTsushimaProjectile* Proj = Cast<ACallOfTsushimaProjectile>(OtherActor))
     {
-        FLinearColor Color = Proj->ColorTag == FName("Red") ? FLinearColor::Red : FLinearColor::Blue;
+        FLinearColor Color = Proj->ColorTag == FName("Red")
+            ? (AltRed != FColor::Black ? AltRed : FLinearColor::Red)
+            : (AltBlue != FColor::Black ? AltBlue : FLinearColor::Blue);
         PaintCellAtWorldLocation(Hit, Color);
     }
 }
@@ -96,8 +98,8 @@ TMap<EPaintColor, int> APaintableSurface::GetColorStats()
     
     for (const auto& Pair : PaintedGrid)
     {
-        if (Pair.Value == FLinearColor::Red) Red++;
-        else if (Pair.Value == FLinearColor::Blue) Blue++;
+        if (Pair.Value == (AltRed != FColor::Black ? AltRed : FLinearColor::Red)) Red++;
+        else if (Pair.Value == (AltBlue != FColor::Black ? AltBlue : FLinearColor::Blue)) Blue++;
     }
     
     ColorStats[EPaintColor::Red] = Red;

@@ -35,4 +35,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTimerEnded OnTimerEnded;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor Blue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor Red;
+	
+	FLinearColor ConvertColor(TSharedPtr<FJsonValue>& JsonValue);
 };

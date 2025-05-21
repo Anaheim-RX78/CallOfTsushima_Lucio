@@ -61,6 +61,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPainted OnPainted;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FColor AltRed = FColor::Black;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FColor AltBlue = FColor::Black;
 	
 
 private:
